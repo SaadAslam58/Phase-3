@@ -1,0 +1,441 @@
+openapi: 3.0.3
+info:
+  title: Todo Application API
+  description: API specification for the Todo Application frontend-backend communication
+  version: 1.0.0
+  contact:
+    name: Todo App Development Team
+
+servers:
+  - url: http://localhost:3001
+    description: Local development server
+  - url: https://api.todoapp.com
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/tasks:
+    get:
+      summary: Get all tasks for the authenticated user
+      description: Retrieves a list of all tasks owned by the currently authenticated user
+      responses:
+        '200':
+          description: Successfully retrieved tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new task
+      description: Creates a new task for the authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                  description: The title of the task
+                  example: "Buy groceries"
+                description:
+                  type: string
+                  description: Optional description of the task
+                  example: "Milk, bread, eggs, cheese"
+                status:
+                  type: string
+                  enum: [todo, in-progress, completed]
+                  description: Status of the task
+                  default: todo
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/tasks/{id}:
+    get:
+      summary: Get a specific task
+      description: Retrieves a specific task by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the task
+      responses:
+        '200':
+          description: Successfully retrieved the task
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task:
+                    $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update a task
+      description: Updates an existing task with new information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The title of the task
+                  example: "Buy groceries"
+                description:
+                  type: string
+                  description: Optional description of the task
+                  example: "Milk, bread, eggs, cheese"
+                status:
+                  type: string
+                  enum: [todo, in-progress, completed]
+                  description: Status of the task
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete a task
+      description: Deletes a specific task by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the task
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/tasks/stats:
+    get:
+      summary: Get task statistics for the authenticated user
+      description: Retrieves summary statistics about tasks for the currently authenticated user
+      responses:
+        '200':
+          description: Successfully retrieved task statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: Total number of tasks
+                    example: 10
+                  completed:
+                    type: number
+                    description: Number of completed tasks
+                    example: 4
+                  pending:
+                    type: number
+                    description: Number of pending tasks
+                    example: 6
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/auth/login:
+    post:
+      summary: Authenticate user and get JWT token
+      description: Authenticates a user and returns a JWT token for subsequent API requests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  description: The user's password
+                  example: "securePassword123"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    format: jwt
+                    description: JWT token for authentication
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/auth/signup:
+    post:
+      summary: Create a new user account
+      description: Creates a new user account and returns authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address
+                  example: "newuser@example.com"
+                password:
+                  type: string
+                  format: password
+                  description: The user's password
+                  example: "securePassword123"
+                name:
+                  type: string
+                  description: The user's display name
+                  example: "John Doe"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    format: jwt
+                    description: JWT token for authentication
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - status
+        - createdAt
+        - updatedAt
+        - userId
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the task
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        title:
+          type: string
+          maxLength: 255
+          description: The title of the task
+          example: "Buy groceries"
+        description:
+          type: string
+          maxLength: 1000
+          description: Optional description of the task
+          example: "Milk, bread, eggs, cheese"
+        status:
+          type: string
+          enum: [todo, in-progress, completed]
+          description: Current status of the task
+          example: "todo"
+        createdAt:
+          type: string
+          format: date-time
+          description: When the task was created
+          example: "2023-01-01T12:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the task was last updated
+          example: "2023-01-01T12:00:00Z"
+        userId:
+          type: string
+          format: uuid
+          description: ID of the user who owns the task
+          example: "123e4567-e89b-12d3-a456-426614174001"
+
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the user
+          example: "123e4567-e89b-12d3-a456-426614174001"
+        email:
+          type: string
+          format: email
+          description: The user's email address
+          example: "user@example.com"
+        name:
+          type: string
+          description: The user's display name
+          example: "John Doe"
+        createdAt:
+          type: string
+          format: date-time
+          description: When the user account was created
+          example: "2023-01-01T12:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: When the user account was last updated
+          example: "2023-01-01T12:00:00Z"
+
+  responses:
+    BadRequestError:
+      description: Bad request - invalid input data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Invalid input data"
+              details:
+                type: object
+                additionalProperties: true
+
+    UnauthorizedError:
+      description: Unauthorized - authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Authentication required"
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Resource not found"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Internal server error"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoint

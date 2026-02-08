@@ -1,0 +1,230 @@
+openapi: 3.0.0
+info:
+  title: AI Agents Chat API
+  version: 1.0.0
+  description: Chat endpoint for AI agent interactions in the Todo application
+servers:
+  - url: http://localhost:7860
+    description: Development server
+
+paths:
+  /api/{user_id}/chat:
+    post:
+      summary: Send a message to the AI agent and receive a response
+      description: |
+        Processes a user's natural language message through the AI agent orchestrator.
+        The orchestrator delegates to specialized agents (action, data insight, policy)
+        which execute operations via function tools. Returns a structured response.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The authenticated user's ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful AI agent response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Bad request - empty message or invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - missing or invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - user_id mismatch with JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error (AI service failure, DB error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatErrorResponse'
+      security:
+        - bearerAuth: []
+
+  /api/{user_id}/conversations:
+    get:
+      summary: List user's conversations
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationSummary'
+      security:
+        - bearerAuth: []
+
+  /api/{user_id}/conversations/{conversation_id}/messages:
+    get:
+      summary: Get messages for a conversation
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of messages in chronological order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageResponse'
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: The user's natural language message
+          example: "Add a task to buy groceries"
+        conversation_id:
+          type: integer
+          nullable: true
+          description: Optional ID of existing conversation to continue. If null, a new conversation is created.
+          example: 123
+
+    ChatResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+        conversation_id:
+          type: integer
+          description: ID of the conversation (new or existing)
+          example: 123
+        response:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [text, action, insight]
+              description: Type of response
+            content:
+              type: string
+              description: The AI's natural language response
+              example: "I've added 'buy groceries' to your tasks."
+            meta:
+              type: object
+              properties:
+                tool_calls:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "add_task"
+                      result:
+                        type: object
+
+    ChatErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [error]
+        conversation_id:
+          type: integer
+          nullable: true
+        response:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [text]
+            content:
+              type: string
+              description: User-friendly error message
+              example: "I'm sorry, I encountered an issue processing your request. Please try again."
+            meta:
+              type: object
+
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: "Authentication required"
+
+    ConversationSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    MessageResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        tool_calls_json:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time

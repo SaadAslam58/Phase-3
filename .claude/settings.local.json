@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(if exist frontend rmdir /s /q frontend)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(python -m venv:*)",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-2\\\\backend\\\\venv\\\\Scripts\\\\pip.exe\" install -r \"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-2\\\\backend\\\\requirements.txt\")",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-2\\\\backend\\\\venv\\\\Scripts\\\\python.exe\":*)",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-2\\\\backend\\\\venv\\\\Scripts\\\\python.exe\" -c \"import sys; sys.path.insert\\(0, ''.''\\); from main import app; print\\(''FastAPI app created successfully''\\); print\\(''Routes:''\\); for route in app.routes: print\\(f''  {getattr\\(route, \"\"methods\"\", \"\"\"\"\\)} {getattr\\(route, \"\"path\"\", str\\(route\\)\\)}''\\)\")",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-2\\\\backend\\\\venv\\\\Scripts\\\\python.exe\" -c \"import sys; sys.path.insert\\(0, ''.''\\); from main import app; print\\(''FastAPI app created successfully''\\); routes = [\\(getattr\\(r, ''methods'', set\\(\\)\\), getattr\\(r, ''path'', str\\(r\\)\\)\\) for r in app.routes]; [print\\(f''  {m} {p}''\\) for m, p in routes]\")",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-2\\\\backend\\\\venv\\\\Scripts\\\\python.exe\" -c \"import sys; sys.path.insert\\(0, ''.''\\); from main import app; print\\(''FastAPI app created successfully''\\); print\\(''Registered routes:''\\); [print\\(f''  {getattr\\(r, \"\"methods\"\", set\\(\\)\\)} {getattr\\(r, \"\"path\"\", \"\"n/a\"\"\\)}''\\) for r in app.routes if hasattr\\(r, ''path''\\)]\")",
+      "Bash(npx next build)",
+      "Bash(ping:*)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-2\\\\backend\\\\venv\\\\Scripts\\\\python.exe\" -m uvicorn:*)",
+      "Bash(\"D:/Programming/Q-4/Hackathon-2/Phase-3/backend/venv/Scripts/python.exe\" -c \"import openai_agents; print\\(dir\\(openai_agents\\)\\)\")",
+      "Bash(venvScriptspython.exe -c \"import agents; print\\(agents.__version__\\)\")",
+      "Bash(\"venv/Scripts/python.exe\" -c \"import agents; print\\(agents.__version__\\)\")",
+      "Bash(\"venv/Scripts/python.exe\" -c \"from agents import Agent, Runner, function_tool, handoff, RunContextWrapper; print\\(''SDK imports OK''\\)\")",
+      "Bash(\"venv/Scripts/python.exe\":*)",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-3\\\\backend\\\\venv\\\\Scripts\\\\pip.exe\" show openai-agents)",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-3\\\\backend\\\\venv\\\\Scripts\\\\pip.exe\" list:*)",
+      "Bash(findstr:*)",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-3\\\\backend\\\\venv\\\\Scripts\\\\python.exe\":*)",
+      "Bash(\"D:\\\\Programming\\\\Q-4\\\\Hackathon-2\\\\Phase-3\\\\backend\\\\venv\\\\Scripts\\\\pip.exe\" install:*)",
+      "Bash(\"venv/Scripts/python.exe\" -c \"import sys; sys.path.insert\\(0, ''.''\\); from routes.chat import router; print\\(''Chat router imported OK''\\)\")"
+    ]
+  }
+}

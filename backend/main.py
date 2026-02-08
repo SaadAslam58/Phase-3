@@ -28,9 +28,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration
-cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000,https://*.github.io")
-cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
+# CORS configuration (use exact origins; browser sends scheme+host only, no path)
+cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000,https://saadaslam58.github.io")
+cors_origins = [o.strip().strip("[]") for o in cors_origins_str.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,

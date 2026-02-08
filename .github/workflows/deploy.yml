@@ -43,7 +43,8 @@ jobs:
         cd frontend
         npm run build
       env:
-        NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+        # Backend deployed at Hugging Face Spaces
+        NEXT_PUBLIC_API_BASE_URL: https://saad58-phase-3.hf.space
         # Required so assets and routes work under https://<user>.github.io/<repo>/
         BASE_PATH: /${{ github.event.repository.name }}
 

@@ -41,9 +41,12 @@ jobs:
     - name: Build for GitHub Pages
       run: |
         cd frontend
-        NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }} npm run build
+        NEXT_PUBLIC_API_BASE_URL=https://saad58-phase-3.hf.space npm run build
+        # Static export will be handled by the build process due to output: 'export' in next.config.ts
       env:
-        NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+        NEXT_PUBLIC_API_BASE_URL: https://saad58-phase-3.hf.space
+        NEXT_PUBLIC_BETTER_AUTH_URL: https://saadaslam58.github.io/Phase-3
+        NEXT_PUBLIC_APP_NAME: Todo Dashboard
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -54,5 +57,6 @@ jobs:
         path: ./frontend/out
 
     - name: Deploy to GitHub Pages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       id: deployment
       uses: actions/deploy-pages@v4

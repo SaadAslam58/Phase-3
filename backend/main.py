@@ -29,7 +29,7 @@ app = FastAPI(
 )
 
 # CORS configuration
-cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000")
+cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000,https://*.github.io")
 cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
 
 app.add_middleware(

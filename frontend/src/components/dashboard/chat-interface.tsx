@@ -2,10 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Send, Bot, User, AlertCircle } from "lucide-react";
+import { Send, Bot, User, AlertCircle, Sparkles } from "lucide-react";
 import { api, type ChatMessage } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -80,96 +78,147 @@ export function ChatInterface() {
     }
   };
 
+  const suggestions = [
+    "Show me my tasks",
+    "Add a task to buy groceries",
+    "What's pending today?",
+    "Mark my top task as done",
+  ];
+
   return (
     <div className="flex h-full flex-col">
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      {/* ── Messages area ─────────────────────────────────────── */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         {messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <Bot className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-1">AI Task Assistant</h3>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                Ask me to manage your tasks. Try &quot;Add a task to buy
-                groceries&quot; or &quot;Show me my tasks&quot;.
-              </p>
+          /* Empty state */
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <div className="mb-4 flex h-16 w-16 animate-pulse-glow items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
+              <Bot className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold">AI Task Assistant</h3>
+            <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+              Ask me to manage your tasks in plain English. I can create, update,
+              list, and complete tasks for you.
+            </p>
+
+            {/* Suggestion chips */}
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => {
+                    setInput(s);
+                    inputRef.current?.focus();
+                  }}
+                  className="rounded-full border border-border/60 bg-muted/40 px-4 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                >
+                  {s}
+                </button>
+              ))}
             </div>
           </div>
         ) : (
-          messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={cn(
-                "flex gap-3",
-                msg.role === "user" ? "justify-end" : "justify-start",
-              )}
-            >
-              {msg.role === "assistant" && (
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                  {msg.isError ? (
-                    <AlertCircle className="h-4 w-4 text-destructive" />
-                  ) : (
-                    <Bot className="h-4 w-4 text-primary" />
-                  )}
-                </div>
-              )}
-              <Card
+          <div className="space-y-4">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
                 className={cn(
-                  "max-w-[75%]",
-                  msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : msg.isError
-                      ? "border-destructive/50 bg-destructive/10"
-                      : "bg-muted",
+                  "flex gap-3 animate-fade-in",
+                  msg.role === "user" ? "justify-end" : "justify-start"
                 )}
               >
-                <CardContent className="p-3">
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                </CardContent>
-              </Card>
-              {msg.role === "user" && (
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary">
-                  <User className="h-4 w-4 text-primary-foreground" />
+                {/* Assistant avatar */}
+                {msg.role === "assistant" && (
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
+                      msg.isError
+                        ? "bg-destructive/15"
+                        : "bg-primary/10 ring-1 ring-primary/20"
+                    )}
+                  >
+                    {msg.isError ? (
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                    ) : (
+                      <Sparkles className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                )}
+
+                {/* Bubble */}
+                <div
+                  className={cn(
+                    "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                    msg.role === "user"
+                      ? "rounded-tr-sm bg-primary text-primary-foreground"
+                      : msg.isError
+                      ? "rounded-tl-sm border border-destructive/30 bg-destructive/10 text-destructive"
+                      : "rounded-tl-sm border border-border/40 bg-card text-card-foreground"
+                  )}
+                >
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>
-              )}
-            </div>
-          ))
-        )}
-        {loading && (
-          <div className="flex gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <Bot className="h-4 w-4 text-primary" />
-            </div>
-            <Card className="bg-muted">
-              <CardContent className="p-3">
-                <div className="flex gap-1">
-                  <Skeleton className="h-2 w-2 rounded-full animate-bounce" />
-                  <Skeleton className="h-2 w-2 rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <Skeleton className="h-2 w-2 rounded-full animate-bounce [animation-delay:0.4s]" />
+
+                {/* User avatar */}
+                {msg.role === "user" && (
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary">
+                    <User className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Typing indicator */}
+            {loading && (
+              <div className="flex gap-3 animate-fade-in">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                  <Sparkles className="h-4 w-4 text-primary" />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="rounded-2xl rounded-tl-sm border border-border/40 bg-card px-4 py-3">
+                  <div className="flex gap-1 items-center">
+                    {[0, 150, 300].map((delay) => (
+                      <span
+                        key={delay}
+                        className="h-2 w-2 rounded-full bg-primary/60 animate-bounce"
+                        style={{ animationDelay: `${delay}ms` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input area */}
-      <div className="border-t p-4">
-        <div className="flex gap-2">
+      {/* ── Input area ────────────────────────────────────────── */}
+      <div className="border-t border-border/50 bg-background/60 backdrop-blur-sm p-3 sm:p-4">
+        <div className="flex gap-2 items-center">
           <Input
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
+            placeholder="Ask me to manage your tasks…"
             disabled={loading}
             autoFocus
+            className="h-11 flex-1 bg-input border-border/60 focus:border-primary transition-colors rounded-xl"
+            id="chat-input"
           />
-          <Button onClick={handleSend} disabled={loading || !input.trim()}>
+          <Button
+            onClick={handleSend}
+            disabled={loading || !input.trim()}
+            size="icon"
+            className="h-11 w-11 shrink-0 rounded-xl glow-primary"
+            aria-label="Send message"
+          >
             <Send className="h-4 w-4" />
           </Button>
         </div>
+        <p className="mt-2 text-center text-[10px] text-muted-foreground/60">
+          Press Enter to send · Shift+Enter for new line
+        </p>
       </div>
     </div>
   );

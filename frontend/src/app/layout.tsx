@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_APP_NAME || "Todo Dashboard",
-  description: "A modern, SaaS-grade Todo application for managing your tasks efficiently.",
+  title: process.env.NEXT_PUBLIC_APP_NAME || "Taskify — Smart Task Management",
+  description:
+    "Organize, track, and complete your tasks with an AI-powered dashboard. Beautiful, fast, and built for professionals.",
 };
 
 export default function RootLayout({
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen bg-background text-foreground`}
       >

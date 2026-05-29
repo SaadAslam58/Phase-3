@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 interface TaskFiltersProps {
   search: string;
@@ -24,27 +24,39 @@ export function TaskFilters({
   onStatusFilterChange,
 }: TaskFiltersProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      {/* Search */}
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         <Input
-          placeholder="Search tasks..."
+          id="task-search"
+          placeholder="Search tasks…"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-9"
+          className="h-10 pl-9 bg-input border-border/60 focus:border-primary transition-colors rounded-xl"
+          aria-label="Search tasks"
         />
       </div>
-      <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="All statuses" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All statuses</SelectItem>
-          <SelectItem value="todo">Todo</SelectItem>
-          <SelectItem value="in-progress">In Progress</SelectItem>
-          <SelectItem value="completed">Completed</SelectItem>
-        </SelectContent>
-      </Select>
+
+      {/* Status filter */}
+      <div className="flex items-center gap-2">
+        <SlidersHorizontal className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+          <SelectTrigger
+            id="task-status-filter"
+            className="h-10 w-full sm:w-44 bg-input border-border/60 rounded-xl"
+            aria-label="Filter by status"
+          >
+            <SelectValue placeholder="All statuses" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="todo">Todo</SelectItem>
+            <SelectItem value="in-progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
